@@ -32,13 +32,7 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "planner.h"
 
-typedef struct
-{
-  float axis_steps_per_mm[4];  
-  float axis_max_speed[4];
-} config; 
-
-const config cfg = 
+config cfg = 
   {
     .axis_steps_per_mm = { 64.0, 64.0, 2267.72, 481.516 }, // aixs_steps_per_mm[]
     .axis_max_speed = { 200, 200, 4, 20},  // speed limit for each axis in mm/s 

@@ -23,6 +23,14 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef PLANNER_H
 #define PLANNER_H
 
+typedef struct
+{
+  float axis_steps_per_mm[4];  
+  float axis_max_speed[4];
+} config; 
+
+
+extern config cfg;
 extern float feedrate;
 extern float position[4];  // mm
 extern unsigned char relative_positioning;

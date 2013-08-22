@@ -155,6 +155,7 @@ void read_command()
     unsigned char axis_map;
     int line = -1, i, checksum, checksum_received;
     float coord[4] = {0,0,0,0}; 
+    float tmp;
 
       read_line(cmd, 64);
       if (sscanf(cmd, "N%d", &line))
@@ -299,6 +300,35 @@ void read_command()
                 case 83: // switch to relative extruding
                     relative_extruding = true;
                     puts("ok\r\n");
+                    break;
+
+                case 92: // set axis steps_per_mm
+                    token = strtok( NULL, " ");
+                    if (token != NULL &&  sscanf(token, "%[xXyYzZeE]%f",&cmd_type, &tmp))
+                     {
+                        switch (cmd_type) 
+                        {
+                          case 'x': 
+                          case 'X':
+                            cfg.axis_steps_per_mm[0]=tmp;
+                           break;
+
+                          case 'y':
+                          case 'Y':
+                            cfg.axis_steps_per_mm[1]=tmp;
+                            break;
+
+                          case 'z':
+                          case 'Z':
+                            cfg.axis_steps_per_mm[2]=tmp;
+                            break;
+                          case 'e':
+                          case 'E':
+                            cfg.axis_steps_per_mm[3]=tmp;
+                            break;
+                        }
+                     }
+                    puts ("ok\r\n");
                     break;
                 case 104: // set extruder temperature
                 case 140: // set bed temperature

@@ -59,8 +59,8 @@ unsigned long ctrl[2];
 
 float cur_temp[2] = { 0, 0};
 
-float p_gain[2] = { 2000.0, 1000.0 };
-float i_gain[2] = { 20.0, 20.0 };
+float p_gain[2] = { 2000.0, 1500.0 };
+float i_gain[2] = { 40.0, 40.0 };
 
 float adc_to_temp(long value, int table_index)
 {
