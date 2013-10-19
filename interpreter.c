@@ -19,18 +19,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 #include "inc/hw_types.h"
 #include "inc/hw_ints.h" 
 #include "inc/hw_sysctl.h"
 #include "inc/hw_memmap.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/gpio.h"
 #include "driverlib/uart.h"
 #include "driverlib/rom.h"
+#include "driverlib/sysctl.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "delay.h"
 #include "stepper_control.h"
 #include "planner.h"

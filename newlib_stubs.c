@@ -12,6 +12,7 @@
 #include "inc/hw_sysctl.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/times.h>

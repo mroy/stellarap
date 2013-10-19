@@ -22,8 +22,12 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
+#include "driverlib/pin_map.h"
 #include "driverlib/adc.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
@@ -83,8 +87,8 @@ void heaters_isr()
   unsigned long adc_buf[2];
   float error[2] = {0 , 0};
   int tmp ;
-  ADCIntClear(ADC_BASE,0 );
-  tmp = ADCSequenceDataGet(ADC_BASE, 0, adc_buf);
+  ADCIntClear(ADC0_BASE,0 );
+  tmp = ADCSequenceDataGet(ADC0_BASE, 0, adc_buf);
   if (tmp == 2)
   {
     
@@ -139,19 +143,19 @@ void heaters_init()
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
   ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2 | GPIO_PIN_3 );
   ROM_SysCtlADCSpeedSet(SYSCTL_ADCSPEED_1MSPS);
-  ROM_ADCHardwareOversampleConfigure(ADC_BASE, 64);
+  ROM_ADCHardwareOversampleConfigure(ADC0_BASE, 64);
 
   //setup ADC sequence to read CH0 and CH1 on the timer3 trigger
-  ROM_ADCSequenceDisable(ADC_BASE, 0);
-  ROM_ADCSequenceStepConfigure(ADC_BASE, 0, 1, ADC_CTL_CH1 | ADC_CTL_END | ADC_CTL_IE );
-  ROM_ADCSequenceStepConfigure(ADC_BASE, 0, 0, ADC_CTL_CH0 );
-  ROM_ADCSequenceConfigure(ADC_BASE, 0 , ADC_TRIGGER_TIMER, 0);
-  ROM_ADCSequenceEnable(ADC_BASE, 0);
+  ROM_ADCSequenceDisable(ADC0_BASE, 0);
+  ROM_ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH1 | ADC_CTL_END | ADC_CTL_IE );
+  ROM_ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0 );
+  ROM_ADCSequenceConfigure(ADC0_BASE, 0 , ADC_TRIGGER_TIMER, 0);
+  ROM_ADCSequenceEnable(ADC0_BASE, 0);
 
   //Assign ISR for sequence 0 and enable the interrupt and 
   //start the timer3 trigger.
-  ADCIntRegister(ADC_BASE, 0, heaters_isr);
-  ADCIntEnable(ADC_BASE, 0);
+  ADCIntRegister(ADC0_BASE, 0, heaters_isr);
+  ADCIntEnable(ADC0_BASE, 0);
   ROM_TimerEnable(TIMER3_BASE, TIMER_A); 
 
   //setup timer2 as a split timer for generating PWM outputs

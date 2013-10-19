@@ -21,6 +21,8 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "inc/hw_gpio.h"
 #include "inc/hw_types.h"
@@ -109,7 +111,7 @@ void endstops_isr()
     }
   }
 
-  ROM_GPIOPinIntClear( ENDSTOP_PORT, ENDSTOP_ALLPINS);
+  GPIOIntClear( ENDSTOP_PORT, ENDSTOP_ALLPINS);
   ROM_IntMasterEnable();
 }
 
@@ -119,7 +121,7 @@ void endstops_init()
   ROM_GPIOPinTypeGPIOInput(ENDSTOP_PORT, ENDSTOP_ALLPINS );
   ROM_GPIOPadConfigSet(ENDSTOP_PORT, ENDSTOP_ALLPINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
   ROM_GPIOIntTypeSet(ENDSTOP_PORT, ENDSTOP_ALLPINS, GPIO_FALLING_EDGE );
-  GPIOPortIntRegister( ENDSTOP_PORT, endstops_isr );
-  ROM_GPIOPinIntEnable( ENDSTOP_PORT, ENDSTOP_ALLPINS );
+  GPIOIntRegister( ENDSTOP_PORT, endstops_isr );
+  GPIOIntEnable( ENDSTOP_PORT, ENDSTOP_ALLPINS );
 }
 

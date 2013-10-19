@@ -33,7 +33,8 @@
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
 #include <stdio.h>
-
+#include <stdint.h>
+#include <stdbool.h>
 //-----------------------------------------------------------------------------
 //               Functions declarations
 //-----------------------------------------------------------------------------

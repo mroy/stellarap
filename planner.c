@@ -24,11 +24,14 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
 
+#include <math.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+
 #include "driverlib/rom.h"
 #include "driverlib/gpio.h"
 #include "stepper_control.h"
-#include <math.h>
-#include <stdlib.h>
 
 #include "planner.h"
 

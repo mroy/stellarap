@@ -19,6 +19,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <stdint.h>
+#include <stdbool.h>
+
 
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
