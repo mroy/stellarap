@@ -60,7 +60,7 @@ void interpreter_init()
 
 void cmd_request_resend()
 {
-  printf("resend: %d\r\n", current_line+1);
+  printf("rs %d\r\n", current_line+1);
 }
 
 int read_line(char *buf, int length)
@@ -167,7 +167,9 @@ void read_command()
         checksum=0;
         for (i=0;i<64 && cmd[i] != '*' && cmd[i] != 0 ;i++)
           checksum ^= cmd[i];
-        if ( (sscanf( &(cmd[i]), "*%d", &checksum_received) == 0) || 
+        if (i==0)
+		return; // for some reason empty cmd was received
+	if ( (sscanf( &(cmd[i]), "*%d", &checksum_received) == 0) || 
            (checksum_received != checksum)) // bad checksum. re-request command to be sent.
         {
           cmd_request_resend();
@@ -176,7 +178,7 @@ void read_command()
 
         cmd_buf[i]=0; // truncate string to length of command.
         for (i=0;i<64;i++)
-          if (cmd[i]=='G' || cmd[i]=='M' || cmd[i] == 'g' || cmd[i] == 'm')
+          if (cmd[i] == 'T' || cmd[i] == 't' || cmd[i]=='G' || cmd[i]=='M' || cmd[i] == 'g' || cmd[i] == 'm')
           {
             cmd = &cmd[i]; // move string starting point to the beginning of the command.
             break;
@@ -187,7 +189,7 @@ void read_command()
 
       if ( (token = strtok( cmd, " ")) != NULL)
       {
-        if (sscanf(token, "%[gGMm]%d",&cmd_type, &gcode))
+        if (sscanf(token, "%[tTgGMm]%d",&cmd_type, &gcode))
         {
 
           if (line != -1)
@@ -203,6 +205,11 @@ void read_command()
 
           switch (cmd_type)
           {
+	    case 't':
+	    case 'T': //only supports one extruder.. so just ignore tool changes
+		puts("ok\r\n"); 
+		break;
+
             case 'g':
             case 'G':
               
@@ -353,11 +360,11 @@ void read_command()
                 case 110: // set current line number
                   token = strtok(NULL, " ");
                   if (sscanf(token, "%d", &line))
-                  {
                     current_line = line;
-                    puts ("ok\r\n");
-                  }
-                  break;
+                  else
+		    current_line = 1;
+                  puts("ok\r\n");  
+		break;
 
                 case 112: // emergency stop
                   if (cur_block != NULL && num_blocks > 0)
@@ -366,6 +373,10 @@ void read_command()
                   motor_disable();
                   while (true);  
                   break;
+
+		case 115: // capabilities
+		  puts ("ok\r\n");
+		  break;
 
                  case 999: // heater test.  
                     for  (i=0; i<60;i++)
