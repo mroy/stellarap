@@ -140,17 +140,17 @@ void heaters_init()
   //setup pins E2, E3 as ADC inputs
   //1MSPS speed
   //64 times oversampling
-  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-  ROM_GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2 | GPIO_PIN_3 );
-  ROM_SysCtlADCSpeedSet(SYSCTL_ADCSPEED_1MSPS);
-  ROM_ADCHardwareOversampleConfigure(ADC0_BASE, 64);
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+  GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_2 | GPIO_PIN_3 );
+  //SysCtlADCSpeedSet(SYSCTL_ADCSPEED_1MSPS);
+  ADCHardwareOversampleConfigure(ADC0_BASE, 64);
 
   //setup ADC sequence to read CH0 and CH1 on the timer3 trigger
-  ROM_ADCSequenceDisable(ADC0_BASE, 0);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH1 | ADC_CTL_END | ADC_CTL_IE );
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0 );
-  ROM_ADCSequenceConfigure(ADC0_BASE, 0 , ADC_TRIGGER_TIMER, 0);
-  ROM_ADCSequenceEnable(ADC0_BASE, 0);
+  ADCSequenceDisable(ADC0_BASE, 0);
+  ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH1 | ADC_CTL_END | ADC_CTL_IE );
+  ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0 );
+  ADCSequenceConfigure(ADC0_BASE, 0 , ADC_TRIGGER_TIMER, 0);
+  ADCSequenceEnable(ADC0_BASE, 0);
 
   //Assign ISR for sequence 0 and enable the interrupt and 
   //start the timer3 trigger.
