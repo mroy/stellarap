@@ -37,7 +37,7 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 config cfg = 
   {
-    .axis_steps_per_mm = { 64.0, 64.0, 2267.72, 495 }, // aixs_steps_per_mm[]
+    .axis_steps_per_mm = { 100.0, 100.0, 2267.72, 495 }, // aixs_steps_per_mm[]
     .axis_max_speed = { 200, 200, 4, 20},  // speed limit for each axis in mm/s 
   };
 unsigned long lmin( unsigned long a, unsigned long b ) 
