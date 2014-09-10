@@ -37,8 +37,8 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 config cfg = 
   {
-    .axis_steps_per_mm = { 100.0, 100.0, 2267.72, 495 }, // aixs_steps_per_mm[]
-    .axis_max_speed = { 200, 200, 4, 20},  // speed limit for each axis in mm/s 
+    .axis_steps_per_mm = { 100.0, 100.0, 2267.72, 650 }, // aixs_steps_per_mm[]
+    .axis_max_speed = { 300, 300, 4, 20},  // speed limit for each axis in mm/s 
   };
 unsigned long lmin( unsigned long a, unsigned long b ) 
 { 
@@ -327,7 +327,7 @@ block_t* planner_line( float *dest,  float  feedrate)
   nominal_rate = nominal_rate * speed_factor;
   new_block->nominal_rate = nominal_rate;
   new_block->acceleration_rate = ( new_block->steps[0] == 0 && new_block->steps[1] == 0)? MOTOR_ACCEL_RATE_ZE : MOTOR_ACCEL_RATE;
-  if (num_blocks > 0 && blk_queue[last].status != BLOCK_RUNNING) // dont touch running blocks
+  if (num_blocks > 0) 
   {
     new_block->initial_rate = (&blk_queue[last])->nominal_rate;
     if (jerk > MAX_XYZ_JERK)
@@ -336,10 +336,13 @@ block_t* planner_line( float *dest,  float  feedrate)
     if (ejerk > MAX_E_JERK)
       jerk_factor = fmin( jerk_factor, MAX_E_JERK/ejerk );
       
-      new_block->max_entry_rate = nominal_rate * fmin(jerk_factor,speed_factor);
+    new_block->max_entry_rate = nominal_rate * fmin(jerk_factor,speed_factor);
 
-    (&blk_queue[last])->final_rate = new_block->nominal_rate;
-    (&blk_queue[last])->recalculate = 1;
+    if (blk_queue[last].status != BLOCK_RUNNING) // dont touch running blocks
+    {
+       (&blk_queue[last])->final_rate = new_block->nominal_rate;
+       (&blk_queue[last])->recalculate = 1;
+    }
   } 
 
   accel_steps = estimate_accel_distance(nominal_rate, new_block->initial_rate, new_block->acceleration_rate);
