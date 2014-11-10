@@ -27,11 +27,11 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 #define MOTOR_PERIPH SYSCTL_PERIPH_GPIOB
 #define BLOCK_QUEUE_SIZE 16 
 
-#define MAX_STEP_RATE 20000
+#define MAX_STEP_RATE 40000
 #define MIN_STEP_RATE 100 
 #define MOTOR_ACCEL_RATE_ZE 30000
-#define MOTOR_ACCEL_RATE 20000 // steps / second^2 
-#define MAX_XYZ_JERK 20
+#define MOTOR_ACCEL_RATE 100000 // steps / second^2 
+#define MAX_XYZ_JERK 50.0
 #define MAX_E_JERK 28
 enum DIRECTION { DIR_CW = 1, DIR_CCW = -1 };
 
@@ -43,7 +43,7 @@ enum MOTOR_XDIR {
     MOTOR_XINC_DIR = DIR_CW,
     MOTOR_YINC_DIR = DIR_CCW,
     MOTOR_ZINC_DIR = DIR_CCW,
-    MOTOR_EINC_DIR = DIR_CW
+    MOTOR_EINC_DIR = DIR_CCW
 };
 
 

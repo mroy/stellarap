@@ -44,6 +44,11 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 unsigned int current_line = 0;
 unsigned char units_inch = 0;
 
+char uart_buf[UART_BUF_SIZE]; 
+int uart_buf_len; 
+int uart_buf_tail; 
+int uart_buf_head; 
+
 void interpreter_init()
 {
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -56,6 +61,15 @@ void interpreter_init()
                           (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
                            UART_CONFIG_WLEN_8));
 
+
+  uart_buf_len = 0;
+  uart_buf_head = 0;
+  uart_buf_tail = 0 ;
+
+  UARTIntRegister(UART0_BASE, UARTIntHandler); 
+  ROM_IntEnable(INT_UART0);
+  ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT); 
+
 }
 
 void cmd_request_resend()
@@ -63,20 +77,50 @@ void cmd_request_resend()
   printf("rs %d\r\n", current_line+1);
 }
 
+
+void UARTIntHandler(void)
+{
+	uint32_t status = ROM_UARTIntStatus(UART0_BASE, true);
+	ROM_UARTIntClear(UART0_BASE, status); 
+	
+	while ( uart_buf_len < UART_BUF_SIZE && ROM_UARTCharsAvail(UART0_BASE))
+	{
+		uart_buf[uart_buf_tail++] = ROM_UARTCharGetNonBlocking(UART0_BASE); 
+		uart_buf_len++;
+		if (uart_buf_tail == UART_BUF_SIZE)
+			uart_buf_tail = 0;
+	}
+
+	if (uart_buf_len == UART_BUF_SIZE) 
+		printf("Buffer Overflow!\n");
+}
+
+
 int read_line(char *buf, int length)
 {
-  int i;
-  for (i =0; i<length; i++)
+  int i,k, gotCmd;
+  gotCmd  = 0;
+  for (i =0; i<length && i < uart_buf_len; i++)
   {
-    buf[i]=ROM_UARTCharGet(UART0_BASE);
-    if (buf[i] == '\n' || buf[i] == '\r' || buf[i] == ';')
+    buf[i]= uart_buf[ (uart_buf_head+i) % UART_BUF_SIZE ];
+    if (buf[i] == '\n' || buf[i] == '\r')
     {
-      buf[i]=0;
+      gotCmd = 1;
+      buf[i]=0; 
+     // we got our line.  Now take the bytes out of the buffer.
+      for (k=0;k<=i;k++)
+      {
+	uart_buf_head++; 
+	uart_buf_len--;
+	if (uart_buf_head == UART_BUF_SIZE)
+		uart_buf_head = 0;
+      }
+
       break;
     }
 //    ROM_UARTCharPut(UART0_BASE,buf[i]);
   }
-  return i;
+  return (gotCmd == 1)?i:0;
 }
 
 //NOTE strtok must have been 
@@ -161,7 +205,8 @@ void read_command()
     float coord[4] = {0,0,0,0}; 
     float tmp;
 
-      read_line(cmd, 64);
+    if (  read_line(cmd, 64) > 0 ) 
+    { 
       if (sscanf(cmd, "N%d", &line))
       {
         checksum=0;
@@ -356,6 +401,25 @@ void read_command()
                 case 105: // get temperatures 
                   printf("ok T:%f B:%f\r\n", cur_temp[1], cur_temp[0]);
                   break;
+		
+		case 106: // fan on.  Fan not currently supported, just print OK
+		case 107: // fan off.
+		   puts("ok\r\n");
+		   break;
+		
+		case 109: // set extruder temperature and wait 
+		case 190: // set bed temperature and wait
+		   token = strtok( NULL, " ");
+		   i = (gcode==109)?1:0;
+		   if (token != NULL && sscanf(token, "%[sS]%d", &cmd_type, &gcode))
+		   {
+			if (gcode == 0) 
+			  error_i[i] = 0;
+			setpoint[i]=gcode; 
+			while (cur_temp[i] < setpoint[i] );
+			puts("ok\r\n");
+
+		   }
 
                 case 110: // set current line number
                   token = strtok(NULL, " ");
@@ -402,6 +466,6 @@ void read_command()
           }
         }
       }
-
+    } 
 }
 

@@ -25,10 +25,12 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MM_PER_INCH 25.4
 
+#define UART_BUF_SIZE 1024 
+
 void interpreter_init();
 void cmd_request_resend();
 int read_line(char *buf, int length);
 unsigned char strtok_coords(char *token, float *coords);
 void read_command();
-
+void UARTIntHandler(void);
 #endif

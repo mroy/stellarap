@@ -147,7 +147,7 @@ void recalculate_block_entries_reverse()
    if (prev_index < 0)
      prev_index= BLOCK_QUEUE_SIZE-1;
    prev = &blk_queue[prev_index];
-  if (true || cur->status == BLOCK_QUEUED )
+  if (cur->status == BLOCK_QUEUED )
    {
     cur->initial_rate = cur->max_entry_rate; 
      if (cur->nominal_rate > cur->final_rate)
@@ -164,8 +164,8 @@ void recalculate_block_entries_reverse()
        prev->final_rate = cur->initial_rate; 
        prev->recalculate = 1; 
      } 
-     cur = prev; 
     }
+    cur = prev;
   }
 //  if (cur->nominal_rate > prev->nominal_rate) 
 }
@@ -321,18 +321,23 @@ block_t* planner_line( float *dest,  float  feedrate)
   ejerk = current_speed[3]-previous_speed[3];  
   jerk = sqrt(jerk);
 
-
   new_block->initial_rate = MIN_STEP_RATE;
   new_block->final_rate = MIN_STEP_RATE;
   nominal_rate = nominal_rate * speed_factor;
   new_block->nominal_rate = nominal_rate;
   new_block->acceleration_rate = ( new_block->steps[0] == 0 && new_block->steps[1] == 0)? MOTOR_ACCEL_RATE_ZE : MOTOR_ACCEL_RATE;
+  new_block->max_entry_rate = nominal_rate;
   if (num_blocks > 0) 
   {
-    new_block->initial_rate = (&blk_queue[last])->nominal_rate;
+
+	if (blk_queue[last].status == BLOCK_RUNNING) 
+		new_block->initial_rate = fmax(MIN_STEP_RATE, (&blk_queue[last])->final_rate); 
+	else 
+		new_block->initial_rate = (&blk_queue[last])->nominal_rate;
+
     if (jerk > MAX_XYZ_JERK)
       jerk_factor = MAX_XYZ_JERK/jerk;
-    
+
     if (ejerk > MAX_E_JERK)
       jerk_factor = fmin( jerk_factor, MAX_E_JERK/ejerk );
       
@@ -346,6 +351,7 @@ block_t* planner_line( float *dest,  float  feedrate)
   } 
 
   accel_steps = estimate_accel_distance(nominal_rate, new_block->initial_rate, new_block->acceleration_rate);
+
   if (accel_steps == 0)
   {
     new_block->initial_rate = nominal_rate;
@@ -383,7 +389,7 @@ block_t* planner_line( float *dest,  float  feedrate)
   blk_queue_tail=next_block_index(blk_queue_tail);
   recalculate_block_entries();
 
-//  printf("step_event_count: %d, accel_steps: %d, nominal_rate: %d ", new_block->step_event_count, accel_steps, new_block->nominal_rate);
+  //printf("step_event_count: %d, accel_steps: %d, nominal_rate: %d ", new_block->step_event_count, accel_steps, new_block->nominal_rate);
 //  printf("initial_rate: %d, final_rate: %d ",new_block->initial_rate, new_block->final_rate);
 //  printf("accel until: %d, decel after: %d\r\n ",new_block->accelerate_until, new_block->decelerate_after);
     return new_block;

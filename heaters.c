@@ -119,7 +119,7 @@ void heaters_isr()
      
         ctrl[i]= (unsigned long)(p_gain[i]*error[i] + i_gain[i]*error_i[i]);
         if (ctrl[i] > 0xFFF0)
-         ctrl[i]=0xFFF0;
+         ctrl[i]=0xFFF00;
       } else 
       {
         ctrl[i] = 0;
