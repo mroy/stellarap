@@ -66,9 +66,10 @@ void interpreter_init()
   uart_buf_head = 0;
   uart_buf_tail = 0 ;
 
+  UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX1_8);
   UARTIntRegister(UART0_BASE, UARTIntHandler); 
   ROM_IntEnable(INT_UART0);
-  ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT); 
+  ROM_UARTIntEnable(UART0_BASE, UART_INT_RX ); 
 
 }
 
@@ -80,6 +81,7 @@ void cmd_request_resend()
 
 void UARTIntHandler(void)
 {
+	int i=0; 
 	uint32_t status = ROM_UARTIntStatus(UART0_BASE, true);
 	ROM_UARTIntClear(UART0_BASE, status); 
 	
@@ -89,9 +91,11 @@ void UARTIntHandler(void)
 		uart_buf_len++;
 		if (uart_buf_tail == UART_BUF_SIZE)
 			uart_buf_tail = 0;
+		i++;
 	}
 
-	if (uart_buf_len == UART_BUF_SIZE) 
+	status = UARTRxErrorGet(UART0_BASE); 
+	if (uart_buf_len == UART_BUF_SIZE || status) 
 		printf("Buffer Overflow!\n");
 }
 
@@ -118,8 +122,9 @@ int read_line(char *buf, int length)
 
       break;
     }
-//    ROM_UARTCharPut(UART0_BASE,buf[i]);
-  }
+  } 
+
+ 
   return (gotCmd == 1)?i:0;
 }
 
@@ -242,6 +247,7 @@ void read_command()
             if (line != current_line + 1 &&
                 !((cmd_type == 'm' || cmd_type == 'M') && gcode == 110)) // line received out of order. re-request correct line.
             {
+		//printf("Error: %s\r\n", cmd);
                 cmd_request_resend(); 
                 return;
             }
@@ -273,7 +279,7 @@ void read_command()
                  break;
 
                case 4:  // dwell
-                  while (num_blocks > 0 ); // wait for buffer to finish.
+                  while (num_blocks > 0); // wait for buffer to finish.
                   token = strtok( NULL, " ");
                   if (token != NULL && sscanf(token, "%[pP]%d", &cmd_type, &gcode))
                   {
@@ -343,7 +349,7 @@ void read_command()
 
                 case 18:
                 case 84:
-                  while (num_blocks > 0); // wait for buffer to empty
+                  while (num_blocks > 0);   // wait for buffer to empty
                   motor_disable();
                   puts("ok\r\n");
                   break;
@@ -438,7 +444,8 @@ void read_command()
                   while (true);  
                   break;
 
-		case 115: // capabilities
+		case 114:
+		 case 115: // capabilities
 		  puts ("ok\r\n");
 		  break;
 

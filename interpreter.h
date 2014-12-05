@@ -25,7 +25,7 @@ along with Stellarap.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MM_PER_INCH 25.4
 
-#define UART_BUF_SIZE 1024 
+#define UART_BUF_SIZE 20480 
 
 void interpreter_init();
 void cmd_request_resend();

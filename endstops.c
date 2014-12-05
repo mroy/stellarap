@@ -82,7 +82,6 @@ unsigned char axis_endstop_triggered(unsigned char axis)
  */
 void endstops_isr()
 {
-  ROM_IntMasterDisable();  
   unsigned char endstop_bits;
   unsigned char endstops[3];
   unsigned char abort = 0;
@@ -112,7 +111,6 @@ void endstops_isr()
   }
 
   GPIOIntClear( ENDSTOP_PORT, ENDSTOP_ALLPINS);
-  ROM_IntMasterEnable();
 }
 
 void endstops_init()

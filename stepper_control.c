@@ -175,7 +175,7 @@ void  Timer0A_ISR(void)
 
   TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT); 
   ROM_IntMasterDisable();  
-   
+
   if (cur_block == NULL)
   {
     if (num_blocks > 0 && blk_queue[blk_queue_head].status == BLOCK_QUEUED && blk_queue[blk_queue_head].recalculate == 0)

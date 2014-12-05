@@ -419,7 +419,7 @@ void planner_home(unsigned char axis_map)
       do
       {
         crash = planner_line(coords, speed);  // this will hit the endstop.
-        while (crash->status != BLOCK_ABORTED_RDY && crash->status != BLOCK_COMPLETED); // wait for the machine to reach endstop or finish block.
+        while (crash->status != BLOCK_ABORTED_RDY && crash->status != BLOCK_COMPLETED);  // wait for the machine to reach endstop or finish block.
       } while (crash->status == BLOCK_COMPLETED); // if block finished, send it again.
           
       if (i==2) 
@@ -434,7 +434,7 @@ void planner_home(unsigned char axis_map)
 
       crash = planner_line(coords, speed*0.1 ); // hit the endstop again, slowly this time
       while (crash->status != BLOCK_ABORTED_RDY);
-
+ 
       coords[i] = 0.1; 
       planner_line(coords, speed ); // back off 0.1mm
       while (num_blocks > 0); 
