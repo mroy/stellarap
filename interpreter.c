@@ -49,6 +49,8 @@ int uart_buf_len;
 int uart_buf_tail; 
 int uart_buf_head; 
 
+extern float position[4];
+
 void interpreter_init()
 {
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -444,7 +446,10 @@ void read_command()
                   while (true);  
                   break;
 
-		case 114:
+		case 114: // report position
+		  printf("ok C: X:%f Y:%f Z:%f E:%f\r\n", position[0],position[1],position[2],position[3]);
+		  break;
+
 		 case 115: // capabilities
 		  puts ("ok\r\n");
 		  break;
